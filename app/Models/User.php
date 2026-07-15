@@ -55,4 +55,12 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    /**
+     * Find the user instance for the given username.
+     */
+    public function findForPassport(string $username): ?self
+    {
+        return $this->where('username', $username)->first();
+    }
 }

@@ -20,6 +20,7 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         \Laravel\Passport\Passport::useClientModel(\App\Models\ClientApplication::class);
+        \Laravel\Passport\Passport::authorizationView('auth.authorize');
 
         // Register Observers
         \App\Models\User::observe(\App\Observers\UserObserver::class);
@@ -48,7 +49,8 @@ class AppServiceProvider extends ServiceProvider
         \Illuminate\Support\Facades\Event::listen(\Illuminate\Auth\Events\Failed::class, function ($event) {
             $user = $event->user;
             $userId = $user ? $user->id : null;
-            \App\Services\AuditLogger::log($userId, 'Failed Login', 'Failed login attempt for email: ' . $event->credentials['email']);
+            $identity = $event->credentials['username'] ?? $event->credentials['email'] ?? 'unknown';
+            \App\Services\AuditLogger::log($userId, 'Failed Login', 'Failed login attempt for identity: ' . $identity);
         });
 
         \Illuminate\Support\Facades\Event::listen(\Illuminate\Auth\Events\PasswordReset::class, function ($event) {

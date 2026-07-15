@@ -14,9 +14,27 @@ class AuthenticatedSessionController extends Controller
     /**
      * Display the login view.
      */
-    public function create(): View
+    public function create(Request $request): View
     {
-        return view('auth.login');
+        $clientId = $request->query('client_id');
+        
+        if (!$clientId && session()->has('url.intended')) {
+            $intendedUrl = session()->get('url.intended');
+            $parsedUrl = parse_url($intendedUrl);
+            if (isset($parsedUrl['query'])) {
+                parse_str($parsedUrl['query'], $queryParams);
+                $clientId = $queryParams['client_id'] ?? null;
+            }
+        }
+
+        $clientApp = null;
+        if ($clientId) {
+            $clientApp = \App\Models\ClientApplication::where('id', $clientId)
+                ->where('status', 'active')
+                ->first();
+        }
+
+        return view('auth.login', compact('clientApp'));
     }
 
     /**
