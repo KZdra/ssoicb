@@ -15,9 +15,9 @@ class UserService extends BaseService
         $this->userRepository = $userRepository;
     }
 
-    public function getAllPaginated(int $perPage = 15)
+    public function getAllPaginated(int $perPage = 15, string $search = null)
     {
-        return $this->userRepository->getPaginated($perPage);
+        return $this->userRepository->getPaginated($perPage, $search);
     }
 
     public function createUser(array $data)
@@ -29,7 +29,6 @@ class UserService extends BaseService
         }
 
         $user = $this->userRepository->create($data);
-        AuditLogger::log(auth()->id(), 'User Created', 'Created user: ' . $user->email);
         
         return $user;
     }
@@ -52,7 +51,6 @@ class UserService extends BaseService
         }
 
         $updatedUser = $this->userRepository->update($id, $data);
-        AuditLogger::log(auth()->id(), 'User Updated', 'Updated user: ' . $updatedUser->email);
 
         return $updatedUser;
     }
@@ -66,7 +64,6 @@ class UserService extends BaseService
         $email = $user->email;
         $this->userRepository->delete($id);
         
-        AuditLogger::log(auth()->id(), 'User Deleted', 'Deleted user: ' . $email);
         return true;
     }
 

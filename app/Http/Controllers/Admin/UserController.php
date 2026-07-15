@@ -14,10 +14,11 @@ class UserController extends Controller
         $this->userService = $userService;
     }
 
-    public function index()
+    public function index(Request $request)
     {
-        $users = $this->userService->getAllPaginated(15);
-        return view('admin.users.index', compact('users'));
+        $search = $request->input('search');
+        $users = $this->userService->getAllPaginated(15, $search);
+        return view('admin.users.index', compact('users', 'search'));
     }
 
     public function create()

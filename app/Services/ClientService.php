@@ -16,28 +16,24 @@ class ClientService extends BaseService
         $this->passportClientRepository = $passportClientRepository;
     }
 
-    public function getAllPaginated(int $perPage = 15)
+    public function getAllPaginated(int $perPage = 15, string $search = null)
     {
-        return $this->clientRepository->getPaginated($perPage);
+        return $this->clientRepository->getPaginated($perPage, $search);
     }
 
     public function createClient(array $data)
     {
         // Use Passport's repository to create the client and generate secret
-        $client = $this->passportClientRepository->create(
-            null,
+        $client = $this->passportClientRepository->createAuthorizationCodeGrantClient(
             $data['name'],
-            $data['redirect'],
-            false,
-            false
+            [$data['redirect']],
+            true // confidential
         );
 
         // Update custom fields
         $client->description = $data['description'] ?? null;
         $client->status = $data['status'] ?? 'active';
         $client->save();
-
-        AuditLogger::log(auth()->id(), 'Client Created', 'Created client application: ' . $client->name);
 
         return $client;
     }
@@ -47,12 +43,10 @@ class ClientService extends BaseService
         $client = $this->clientRepository->findById($id);
         
         $client->name = $data['name'];
-        $client->redirect = $data['redirect'];
+        $client->redirect_uris = [$data['redirect']];
         $client->description = $data['description'] ?? null;
         $client->status = $data['status'] ?? 'active';
         $client->save();
-
-        AuditLogger::log(auth()->id(), 'Client Updated', 'Updated client application: ' . $client->name);
 
         return $client;
     }
@@ -64,9 +58,27 @@ class ClientService extends BaseService
         
         $this->clientRepository->delete($id);
         
-        AuditLogger::log(auth()->id(), 'Client Deleted', 'Deleted client application: ' . $name);
-        
         return true;
+    }
+
+    public function generateSecret($id)
+    {
+        $client = $this->clientRepository->findById($id);
+        $client->secret = \Illuminate\Support\Str::random(40);
+        $client->save();
+
+        AuditLogger::log(auth()->id(), 'Client Secret Generated', 'Generated secret for client application: ' . $client->name);
+        return $client;
+    }
+
+    public function regenerateSecret($id)
+    {
+        $client = $this->clientRepository->findById($id);
+        $client->secret = \Illuminate\Support\Str::random(40);
+        $client->save();
+
+        AuditLogger::log(auth()->id(), 'Client Secret Regenerated', 'Regenerated secret for client application: ' . $client->name);
+        return $client;
     }
 
     public function findById($id)

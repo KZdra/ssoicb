@@ -1,10 +1,16 @@
 <x-app-layout>
     <x-slot name="header">
-        {{ __('Active Sessions Management') }}
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center">
+            <span class="mb-2 mb-md-0">{{ __('Active Sessions') }}</span>
+        </div>
     </x-slot>
 
-    <div class="card shadow-sm border-0">
-        <div class="card-body">
+    <div class="card shadow-sm border-0 mb-4">
+        <div class="card-body p-0">
+            <div class="p-4 border-bottom bg-white rounded-top">
+                <h5 class="m-0 text-dark fw-semibold" style="font-size: 1rem;">Current Active Sessions</h5>
+            </div>
+            
             <div class="table-responsive">
                 <table class="table table-hover align-middle">
                     <thead class="table-light">
@@ -37,10 +43,13 @@
                                     {{ \Carbon\Carbon::createFromTimestamp($session->last_activity)->diffForHumans() }}
                                 </td>
                                 <td>
-                                    <form action="{{ route('admin.sessions.destroy', $session->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Are you sure you want to terminate this session? The user will be logged out.');">
+                                    <form action="{{ route('admin.sessions.destroy', $session->id) }}" method="POST" onsubmit="return confirm('Are you sure you want to terminate this session? The user will be logged out.');">
                                         @csrf
                                         @method('DELETE')
-                                        <button type="submit" class="btn btn-sm btn-outline-danger">Terminate</button>
+                                        <button type="submit" class="btn btn-sm btn-light text-danger border shadow-sm d-flex align-items-center gap-1" title="Terminate Session">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18.36 6.64a9 9 0 1 1-12.73 0"></path><line x1="12" y1="2" x2="12" y2="12"></line></svg>
+                                            <span class="d-none d-md-inline">Terminate</span>
+                                        </button>
                                     </form>
                                 </td>
                             </tr>
@@ -53,7 +62,7 @@
                 </table>
             </div>
 
-            <div class="mt-3">
+            <div class="p-3 border-top">
                 {{ $sessions->links('pagination::bootstrap-5') }}
             </div>
         </div>

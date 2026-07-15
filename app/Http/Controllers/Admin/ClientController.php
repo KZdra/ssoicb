@@ -15,10 +15,24 @@ class ClientController extends Controller
         $this->clientService = $clientService;
     }
 
-    public function index()
+    public function index(Request $request)
     {
-        $clients = $this->clientService->getAllPaginated(15);
-        return view('admin.clients.index', compact('clients'));
+        $search = $request->input('search');
+        $clients = $this->clientService->getAllPaginated(15, $search);
+        // dd($clients);
+        return view('admin.clients.index', compact('clients', 'search'));
+    }
+
+    public function generateSecret($id)
+    {
+        $this->clientService->generateSecret($id);
+        return redirect()->route('admin.clients.index')->with('success', 'Secret generated successfully.');
+    }
+
+    public function regenerateSecret($id)
+    {
+        $this->clientService->regenerateSecret($id);
+        return redirect()->route('admin.clients.index')->with('success', 'Secret regenerated successfully.');
     }
 
     public function create()

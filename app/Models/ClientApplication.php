@@ -28,4 +28,18 @@ class ClientApplication extends Client
         'description',
         'status',
     ];
+
+    /**
+     * Determine if the client should skip the authorization prompt.
+     *
+     * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
+     * @param  array  $scopes
+     * @return bool
+     */
+    public function skipsAuthorization(\Illuminate\Contracts\Auth\Authenticatable $user, array $scopes): bool
+    {
+        // For a seamless SSO experience, we can skip the authorization prompt
+        // for all active internal clients. 
+        return $this->status === 'active';
+    }
 }

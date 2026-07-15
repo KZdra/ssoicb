@@ -21,6 +21,19 @@ class AppServiceProvider extends ServiceProvider
     {
         \Laravel\Passport\Passport::useClientModel(\App\Models\ClientApplication::class);
 
+        // Register Observers
+        \App\Models\User::observe(\App\Observers\UserObserver::class);
+        \App\Models\ClientApplication::observe(\App\Observers\ClientApplicationObserver::class);
+
+        // Passport token lifespans
+        \Laravel\Passport\Passport::tokensExpireIn(now()->addDays(15));
+        \Laravel\Passport\Passport::refreshTokensExpireIn(now()->addDays(30));
+        \Laravel\Passport\Passport::personalAccessTokensExpireIn(now()->addMonths(6));
+        
+        // Skip authorization prompt for seamless SSO experience
+        // (Handled directly in the ClientApplication model now)
+
+
         \Illuminate\Support\Facades\Event::listen(\Illuminate\Auth\Events\Login::class, function ($event) {
             \App\Services\AuditLogger::log($event->user->id, 'Login', 'User logged in successfully.');
             $event->user->update(['last_login' => now()]);
