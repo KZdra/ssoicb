@@ -62,4 +62,23 @@ class AuthenticatedSessionController extends Controller
 
         return redirect('/');
     }
+
+    /**
+     * Destroy an authenticated session via GET request (SSO Single Logout).
+     */
+    public function ssoLogout(Request $request): RedirectResponse
+    {
+        Auth::guard('web')->logout();
+
+        $request->session()->invalidate();
+
+        $request->session()->regenerateToken();
+
+        $redirectUri = $request->query('redirect_uri');
+        if ($redirectUri && (str_starts_with($redirectUri, 'http://127.0.0.1') || str_starts_with($redirectUri, 'http://localhost') || str_starts_with($redirectUri, 'https://'))) {
+            return redirect($redirectUri);
+        }
+
+        return redirect('/login');
+    }
 }

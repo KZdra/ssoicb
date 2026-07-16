@@ -8,6 +8,21 @@
             </a>
         </div>
     </x-slot>
+    @if(session('plain_secret'))
+        <div class="alert alert-warning border-warning shadow-sm mb-4" role="alert">
+            <h4 class="alert-heading fw-bold text-dark d-flex align-items-center gap-2 mb-3">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-warning"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                Copy the Client Secret Now!
+            </h4>
+            <p class="mb-3">Here is the client secret for <strong>{{ session('new_client_name') }}</strong>. Please copy it immediately. <strong>For security reasons, you will not be able to see this secret again.</strong></p>
+            <div class="input-group">
+                <code class="form-control bg-light user-select-all p-3 border rounded text-dark fs-5 font-monospace fw-bold" id="plain-secret-code">{{ session('plain_secret') }}</code>
+                <button class="btn btn-warning fw-semibold px-4" type="button" onclick="navigator.clipboard.writeText(document.getElementById('plain-secret-code').innerText); alert('Secret copied to clipboard!');">
+                    Copy Secret
+                </button>
+            </div>
+        </div>
+    @endif
 
     <div class="card shadow-sm border-0 mb-4">
         <div class="card-body p-0">
@@ -50,12 +65,10 @@
                                 <td>
                                     @if($client->secret)
                                         <div class="d-flex flex-column gap-2 align-items-start">
-                                            <button class="btn btn-sm btn-light border shadow-sm text-secondary w-100" type="button" data-bs-toggle="collapse" data-bs-target="#secret-{{ $client->id }}" aria-expanded="false">
-                                                Show Secret
-                                            </button>
-                                            <div class="collapse w-100" id="secret-{{ $client->id }}">
-                                                <code class="user-select-all d-block bg-light p-2 border rounded">{{ $client->secret }}</code>
-                                            </div>
+                                            <span class="text-muted small d-flex align-items-center">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="me-1 text-success"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                                                Hashed (Secure)
+                                            </span>
                                             <form action="{{ route('admin.clients.regenerate-secret', $client->id) }}" method="POST" class="w-100" onsubmit="return confirm('Regenerate secret? Old secret will no longer work.');">
                                                 @csrf
                                                 <button type="submit" class="btn btn-sm btn-light border shadow-sm text-warning w-100">Regenerate</button>
@@ -64,7 +77,7 @@
                                     @else
                                         <form action="{{ route('admin.clients.generate-secret', $client->id) }}" method="POST">
                                             @csrf
-                                            <button type="submit" class="btn btn-sm btn-success shadow-sm">Generate Secret</button>
+                                            <button type="submit" class="btn btn-sm btn-success shadow-sm w-100">Generate Secret</button>
                                         </form>
                                     @endif
                                 </td>

@@ -64,20 +64,26 @@ class ClientService extends BaseService
     public function generateSecret($id)
     {
         $client = $this->clientRepository->findById($id);
-        $client->secret = \Illuminate\Support\Str::random(40);
+        $plainSecret = \Illuminate\Support\Str::random(40);
+        $client->secret = $plainSecret;
         $client->save();
 
         AuditLogger::log(auth()->id(), 'Client Secret Generated', 'Generated secret for client application: ' . $client->name);
+        
+        $client->plainSecret = $plainSecret;
         return $client;
     }
 
     public function regenerateSecret($id)
     {
         $client = $this->clientRepository->findById($id);
-        $client->secret = \Illuminate\Support\Str::random(40);
+        $plainSecret = \Illuminate\Support\Str::random(40);
+        $client->secret = $plainSecret;
         $client->save();
 
         AuditLogger::log(auth()->id(), 'Client Secret Regenerated', 'Regenerated secret for client application: ' . $client->name);
+        
+        $client->plainSecret = $plainSecret;
         return $client;
     }
 

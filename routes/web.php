@@ -7,6 +7,8 @@ Route::get('/', function () {
     return redirect()->route('dashboard');
 });
 
+Route::get('/sso/logout', [App\Http\Controllers\Auth\AuthenticatedSessionController::class, 'ssoLogout'])->name('sso.logout');
+
 Route::get('/dashboard', function () {
     return view('dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');

@@ -25,13 +25,17 @@ class ClientController extends Controller
 
     public function generateSecret($id)
     {
-        $this->clientService->generateSecret($id);
+        $client = $this->clientService->generateSecret($id);
+        session()->flash('plain_secret', $client->plainSecret);
+        session()->flash('new_client_name', $client->name);
         return redirect()->route('admin.clients.index')->with('success', 'Secret generated successfully.');
     }
 
     public function regenerateSecret($id)
     {
-        $this->clientService->regenerateSecret($id);
+        $client = $this->clientService->regenerateSecret($id);
+        session()->flash('plain_secret', $client->plainSecret);
+        session()->flash('new_client_name', $client->name);
         return redirect()->route('admin.clients.index')->with('success', 'Secret regenerated successfully.');
     }
 
@@ -43,7 +47,9 @@ class ClientController extends Controller
     public function store(\App\Http\Requests\Admin\ClientStoreRequest $request)
     {
         $validated = $request->validated();
-        $this->clientService->createClient($validated);
+        $client = $this->clientService->createClient($validated);
+        session()->flash('plain_secret', $client->plainSecret);
+        session()->flash('new_client_name', $client->name);
         return redirect()->route('admin.clients.index')->with('success', 'Client Application created successfully.');
     }
 
