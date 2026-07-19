@@ -42,8 +42,9 @@ phpunit.xml
 .phpstan.neon
 pint.json
 
-# Docker files sendiri (tidak perlu masuk ke image)
-docker/
+# Docker Compose & Dockerfile tidak perlu masuk ke image
+# CATATAN: folder docker/ HARUS ADA karena berisi entrypoint.sh, php.ini, dll
+#          yang di-COPY oleh Dockerfile saat build!
 docker-compose.yml
 docker-compose.*.yml
 Dockerfile*
