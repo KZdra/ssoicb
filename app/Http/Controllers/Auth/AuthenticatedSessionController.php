@@ -16,7 +16,12 @@ class AuthenticatedSessionController extends Controller
      */
     public function create(Request $request): View
     {
-        $clientId = $request->query('client_id');
+        $clientId = $request->query('client_id') ?? old('client_id');
+        $redirectUri = $request->query('redirect_uri');
+
+        if ($redirectUri) {
+            session(['url.intended' => $redirectUri]);
+        }
         
         if (!$clientId && session()->has('url.intended')) {
             $intendedUrl = session()->get('url.intended');
@@ -46,7 +51,26 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
-        return redirect()->intended(route('dashboard', absolute: false));
+        $clientId = $request->input('client_id');
+        $clientName = 'SSO Dashboard';
+        
+        if ($clientId) {
+            $clientApp = \App\Models\ClientApplication::find($clientId);
+            if ($clientApp) {
+                $clientName = $clientApp->name;
+            }
+        }
+
+        \App\Models\AuditLog::create([
+            'user_id' => Auth::id(),
+            'ip_address' => $request->ip(),
+            'browser' => $request->header('User-Agent'),
+            'operating_system' => null,
+            'action' => 'Login',
+            'description' => 'User logged in to ' . $clientName,
+        ]);
+
+        return redirect()->intended(route('dashboard', absolute: false))->with('success', 'Login berhasil!');
     }
 
     /**

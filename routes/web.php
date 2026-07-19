@@ -4,7 +4,9 @@ use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
-    return redirect()->route('dashboard');
+    return response()->json([
+        'message' => 'Are You Lost? Honey? <:',
+    ]);
 });
 
 Route::get('/sso/logout', [App\Http\Controllers\Auth\AuthenticatedSessionController::class, 'ssoLogout'])->name('sso.logout');
@@ -30,6 +32,7 @@ Route::middleware('auth')->group(function () {
         Route::delete('sessions/{id}', [\App\Http\Controllers\Admin\SessionController::class, 'destroy'])->name('sessions.destroy');
 
         Route::get('audit-logs', [\App\Http\Controllers\Admin\AuditLogController::class, 'index'])->name('audit_logs.index');
+        Route::delete('audit-logs/clear', [\App\Http\Controllers\Admin\AuditLogController::class, 'clear'])->name('audit_logs.clear');
     });
 });
 
