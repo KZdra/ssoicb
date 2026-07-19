@@ -1,0 +1,27 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: ssoicb-app
+    container_name: ssoicb_app
+    restart: unless-stopped
+    ports:
+      - "8001:80"
+    environment:
+      # Koneksi ke database mysql yang sudah berjalan
+      # Jika di Windows (Docker Desktop), bisa menggunakan host.docker.internal
+      # Atau jika di-deploy di network yang sama, gunakan nama containernya (mysql3306)
+      - DB_CONNECTION=mysql
+      - DB_HOST=mysql3306
+      - DB_PORT=3306
+      - DB_DATABASE=ssoicb # Sesuaikan dengan nama database Anda
+      - DB_USERNAME=root
+      - DB_PASSWORD=
+    volumes:
+      - .env:/var/www/html/.env
+      - ./storage:/var/www/html/storage
+      - ./bootstrap/cache:/var/www/html/bootstrap/cache
+    network_mode: "bridge"
