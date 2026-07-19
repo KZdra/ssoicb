@@ -136,5 +136,7 @@ volumes:
 # ============================================================
 networks:
   ssoicb_net:
-    driver: bridge
+    # Network dibuat oleh deploy.sh sebelum 'compose up' dijalankan.
+    # Compose hanya memakai network yang sudah ada, tidak membuatnya.
+    external: true
     name: ssoicb_net
