@@ -13,7 +13,7 @@ set -e
 APP_NAME="ssoICB"
 COMPOSE_FILE="docker-compose.yml"
 CONTAINER_MYSQL="mysql3306"
-NETWORK_NAME="bridge"
+NETWORK_NAME="ssoicb_net"
 APP_URL="http://localhost:8001"
 
 # Warna output
@@ -115,20 +115,25 @@ if ! docker ps --format '{{.Names}}' | grep -q "^${CONTAINER_MYSQL}$"; then
 fi
 log_ok "Container '${CONTAINER_MYSQL}' sedang berjalan."
 
-# --- Step 3: Cek network bridge ---
-log_step "Mengecek Docker network '${NETWORK_NAME}'..."
+# --- Step 3: Siapkan custom user-defined network ---
+# CATATAN: Default 'bridge' network Docker tidak support fitur user-defined.
+# Kita buat network 'ssoicb_net' sendiri agar mysql3306 bisa di-resolve by name.
+log_step "Menyiapkan Docker network '${NETWORK_NAME}'..."
 if ! docker network ls --format '{{.Name}}' | grep -q "^${NETWORK_NAME}$"; then
-    log_warn "Network '${NETWORK_NAME}' tidak ditemukan. Mencoba membuat..."
-    docker network create "${NETWORK_NAME}" || true
+    log_info "Network '${NETWORK_NAME}' belum ada. Membuat..."
+    docker network create --driver bridge "${NETWORK_NAME}"
+    log_ok "Network '${NETWORK_NAME}' berhasil dibuat."
+else
+    log_ok "Network '${NETWORK_NAME}' sudah ada."
 fi
 
-# Cek apakah MySQL sudah terhubung ke network ini
+# Hubungkan container MySQL ke network ssoicb_net agar bisa di-resolve by name
 MYSQL_NETWORKS=$(docker inspect "${CONTAINER_MYSQL}" --format='{{range $k, $v := .NetworkSettings.Networks}}{{$k}} {{end}}' 2>/dev/null || echo "")
 if echo "$MYSQL_NETWORKS" | grep -q "${NETWORK_NAME}"; then
     log_ok "Container '${CONTAINER_MYSQL}' sudah terhubung ke network '${NETWORK_NAME}'."
 else
-    log_warn "Container '${CONTAINER_MYSQL}' belum terhubung ke network '${NETWORK_NAME}'. Menghubungkan..."
-    docker network connect "${NETWORK_NAME}" "${CONTAINER_MYSQL}" 2>/dev/null || true
+    log_info "Menghubungkan '${CONTAINER_MYSQL}' ke network '${NETWORK_NAME}'..."
+    docker network connect "${NETWORK_NAME}" "${CONTAINER_MYSQL}"
     log_ok "Container '${CONTAINER_MYSQL}' berhasil dihubungkan ke network '${NETWORK_NAME}'."
 fi
 

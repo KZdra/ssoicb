@@ -54,7 +54,7 @@ services:
       - ssoicb_bootstrap_cache:/var/www/html/bootstrap/cache
 
     networks:
-      - bridge_network
+      - ssoicb_net
 
     # Healthcheck: pastikan Apache merespons sebelum dianggap "healthy"
     healthcheck:
@@ -70,9 +70,6 @@ services:
       options:
         max-size: "10m"
         max-file: "3"
-
-    depends_on:
-      - queue_worker
 
   # ============================================================
   # Service: Queue Worker (untuk QUEUE_CONNECTION=database)
@@ -95,7 +92,7 @@ services:
     environment:
       APP_ENV: production
       APP_DEBUG: "false"
-      APP_KEY: "" # Akan diisi oleh entrypoint
+      APP_KEY: ""
 
       DB_CONNECTION: mysql
       DB_HOST: mysql3306
@@ -115,7 +112,7 @@ services:
       - ssoicb_bootstrap_cache:/var/www/html/bootstrap/cache
 
     networks:
-      - bridge_network
+      - ssoicb_net
 
     logging:
       driver: "json-file"
@@ -133,11 +130,11 @@ volumes:
     driver: local
 
 # ============================================================
-# Networks: Terhubung ke network Docker bridge yang sudah ada
-# (tempat container mysql3306 berjalan)
+# Networks: Custom user-defined network agar mysql3306 bisa
+# di-resolve by name dari dalam container app/queue.
+# deploy.sh akan otomatis connect mysql3306 ke network ini.
 # ============================================================
 networks:
-  bridge_network:
-    # Gunakan network eksternal yang sudah ada (tempat mysql3306 berjalan)
-    external: true
-    name: bridge
+  ssoicb_net:
+    driver: bridge
+    name: ssoicb_net
