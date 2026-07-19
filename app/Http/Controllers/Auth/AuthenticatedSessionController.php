@@ -22,7 +22,7 @@ class AuthenticatedSessionController extends Controller
         if ($redirectUri) {
             session(['url.intended' => $redirectUri]);
         }
-        
+
         if (!$clientId && session()->has('url.intended')) {
             $intendedUrl = session()->get('url.intended');
             $parsedUrl = parse_url($intendedUrl);
@@ -53,7 +53,7 @@ class AuthenticatedSessionController extends Controller
 
         $clientId = $request->input('client_id');
         $clientName = 'SSO Dashboard';
-        
+
         if ($clientId) {
             $clientApp = \App\Models\ClientApplication::find($clientId);
             if ($clientApp) {
@@ -78,6 +78,7 @@ class AuthenticatedSessionController extends Controller
      */
     public function destroy(Request $request): RedirectResponse
     {
+        $this->broadcastLogout(Auth::guard('web')->user());
         Auth::guard('web')->logout();
 
         $request->session()->invalidate();
@@ -92,6 +93,7 @@ class AuthenticatedSessionController extends Controller
      */
     public function ssoLogout(Request $request): RedirectResponse
     {
+        $this->broadcastLogout(Auth::guard('web')->user());
         Auth::guard('web')->logout();
 
         $request->session()->invalidate();
@@ -99,10 +101,44 @@ class AuthenticatedSessionController extends Controller
         $request->session()->regenerateToken();
 
         $redirectUri = $request->query('redirect_uri');
-        if ($redirectUri && (str_starts_with($redirectUri, 'http://127.0.0.1') || str_starts_with($redirectUri, 'http://localhost') || str_starts_with($redirectUri, 'https://'))) {
+        if ($redirectUri && (str_starts_with($redirectUri, 'http://127.0.0.1') || str_starts_with($redirectUri, 'http://192.168.0.9') || str_starts_with($redirectUri, 'http://localhost') || str_starts_with($redirectUri, 'https://'))) {
             return redirect($redirectUri);
         }
 
         return redirect('/login');
+    }
+
+    private function broadcastLogout($user)
+    {
+        if (!$user) return;
+        
+        $clients = \App\Models\ClientApplication::where('status', 'active')->get();
+        foreach ($clients as $client) {
+            $redirects = $client->redirect_uris; 
+            if (is_string($redirects)) {
+                $redirects = json_decode($redirects, true);
+            }
+            if (!is_array($redirects)) {
+                $redirects = [$client->redirect_uris];
+            }
+            
+            if (isset($redirects[0]) && is_string($redirects[0])) {
+                $parsed = parse_url($redirects[0]);
+                if (isset($parsed['scheme']) && isset($parsed['host'])) {
+                    $port = isset($parsed['port']) ? ':' . $parsed['port'] : '';
+                    $webhookUrl = $parsed['scheme'] . '://' . $parsed['host'] . $port . '/sso/slo';
+                    
+                    try {
+                        \Illuminate\Support\Facades\Log::info('Broadcasting SLO to: ' . $webhookUrl . ' for username: ' . $user->username);
+                        $response = \Illuminate\Support\Facades\Http::timeout(3)->post($webhookUrl, [
+                            'username' => $user->username
+                        ]);
+                        \Illuminate\Support\Facades\Log::info('SLO Response from ' . $webhookUrl . ': ' . $response->status());
+                    } catch (\Exception $e) {
+                        \Illuminate\Support\Facades\Log::error('SLO Webhook Error (' . $webhookUrl . '): ' . $e->getMessage());
+                    }
+                }
+            }
+        }
     }
 }
