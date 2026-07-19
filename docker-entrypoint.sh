@@ -3,16 +3,17 @@ set -e
 
 echo "Menyiapkan aplikasi Laravel..."
 
-# Link storage
-php artisan storage:link || true
+# Link storage (hides error if exists)
+php artisan storage:link -q || true
 
-# Generate APP_KEY jika belum ada di .env (Penting untuk deployment baru)
-if [ -f .env ] && ! grep -q "^APP_KEY=base64:" .env; then
+# Check jika APP_KEY kosong dan .env writable
+if [ -f .env ] && [ -w .env ] && ! grep -q "APP_KEY=base64:" .env; then
     echo "APP_KEY belum diset. Men-generate APP_KEY..."
-    php artisan key:generate --force
+    php artisan key:generate --force || true
 fi
 
 # Clear/Cache configuration
+
 php artisan optimize:clear
 php artisan config:cache
 php artisan route:cache
