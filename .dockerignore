@@ -1,14 +1,74 @@
-/vendor
-/node_modules
-/public/build
-/public/hot
+# ============================================================
+# .dockerignore - File yang TIDAK akan dimasukkan ke Docker image
+# Best practice: exclude semua yang tidak diperlukan untuk runtime
+# ============================================================
+
+# Version control
+.git
+.gitignore
+.gitattributes
+
+# Environment files (JANGAN masukkan .env ke image!)
 .env
-.phpunit.cache
-/.git
-/.github
-/.vscode
-/storage/logs/*.log
-/storage/framework/cache/data/*
-/storage/framework/sessions/*
-/storage/framework/views/*
-/storage/framework/testing/*
+.env.*
+!.env.example
+
+# Node modules (akan diinstall di stage build)
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# Vendor (akan diinstall via composer di Dockerfile)
+vendor/
+
+# Build artifacts & caches
+public/hot
+public/build/
+storage/logs/*.log
+storage/framework/cache/*
+storage/framework/sessions/*
+storage/framework/views/*
+bootstrap/cache/*.php
+
+# Testing
+tests/
+phpunit.xml
+.phpunit.result.cache
+.phpunit.cache/
+
+# Development tools
+.editorconfig
+.php-cs-fixer.php
+.phpstan.neon
+pint.json
+
+# Docker files sendiri (tidak perlu masuk ke image)
+docker/
+docker-compose.yml
+docker-compose.*.yml
+Dockerfile*
+
+# IDE & OS files
+.idea/
+.vscode/
+*.sublime-project
+*.sublime-workspace
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Readme & docs
+*.md
+*.txt
+!README.md
+
+# CI/CD
+.github/
+.gitlab-ci.yml
+Jenkinsfile
+
+# Temporary files
+*.sql
+*.sqlite
+*.log
+.rnd
