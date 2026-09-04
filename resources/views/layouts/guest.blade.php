@@ -1,45 +1,45 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="h-full bg-slate-50">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>{{ config('app.name', 'Laravel') }}</title>
+    <title>{{ config('app.name', 'TEKNIKA SSO') }} - Secure Authentication Gateway</title>
 
     <!-- Fonts -->
-    <link rel="preconnect" href="https://fonts.bunny.net">
-    <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
 
-    <!-- Scripts -->
-    @vite(['resources/css/app.scss', 'resources/js/app.js'])
+    <!-- Scripts & Styles -->
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body class="bg-light" style="background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%); min-height: 100vh;">
-    <div class="container">
-        <div class="row justify-content-center align-items-center min-vh-100">
-            <div class="col-12 col-md-8 col-lg-5 col-xl-4 py-5">
-                <div class="text-center mb-4">
-                    <a href="/" class="text-decoration-none d-inline-block">
-                        <div class="d-flex flex-column align-items-center">
-                            <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center mb-3 shadow" style="width: 64px; height: 64px;">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
-                            </div>
-                            <h1 class="h3 fw-bold text-dark mb-0" style="letter-spacing: -0.05em;">{{ config('app.name', 'Central') }} SSO</h1>
-                            <p class="text-muted mt-1 small">Secure Authentication Gateway</p>
-                        </div>
-                    </a>
+<body class="h-full bg-gradient-to-br from-slate-100 via-indigo-50/30 to-slate-200/70 antialiased font-sans flex items-center justify-center p-4 min-h-screen">
+    <div class="w-full max-w-md my-8">
+        <!-- Brand Header -->
+        <div class="text-center mb-6">
+            <a href="/" class="inline-flex flex-col items-center group text-decoration-none">
+                <div class="w-14 h-14 rounded-2xl bg-gradient-to-tr from-indigo-600 to-cyan-500 text-white flex items-center justify-center shadow-lg shadow-indigo-500/25 group-hover:scale-105 transition-transform duration-200">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-7 h-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
                 </div>
+                <h1 class="mt-3.5 text-2xl font-extrabold text-slate-900 tracking-tight">{{ config('app.name', 'TEKNIKA') }}</h1>
+                <p class="text-xs text-slate-500 font-medium mt-0.5">Central Identity & Access Gateway</p>
+            </a>
+        </div>
 
-                <div class="card shadow-lg border-0" style="border-radius: 1rem; overflow: hidden; background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(10px);">
-                    <div class="card-body p-4 p-md-5">
-                        {{ $slot }}
-                    </div>
-                </div>
-                
-                <div class="text-center mt-4">
-                    <p class="text-muted small">&copy; {{ date('Y') }} {{ config('app.name', 'Laravel') }}. All rights reserved.</p>
-                </div>
+        <!-- Main Card -->
+        <div class="bg-white rounded-2xl shadow-xl shadow-slate-900/5 border border-slate-200/80 p-6 sm:p-8 backdrop-blur-md">
+            {{ $slot }}
+        </div>
+        
+        <!-- Footer -->
+        <div class="text-center mt-6 space-y-1 text-xs text-slate-400">
+            <div class="flex items-center justify-center gap-1.5 text-slate-500 font-medium">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 text-emerald-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                <span>256-Bit SSL Encrypted Connection</span>
             </div>
+            <div>&copy; {{ date('Y') }} {{ config('app.name', 'TEKNIKA') }}. All rights reserved.</div>
         </div>
     </div>
 </body>

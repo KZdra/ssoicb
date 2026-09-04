@@ -1,72 +1,74 @@
 <section>
-    <header class="mb-4">
-        <h2 class="h5 text-dark">
-            {{ __('Profile Information') }}
+    <header class="mb-6">
+        <h2 class="text-base font-bold text-slate-900">
+            {{ __('Informasi Profil') }}
         </h2>
-        <p class="text-muted small">
-            {{ __("Update your account's profile information and email address.") }}
+        <p class="text-xs text-slate-500 mt-1">
+            {{ __("Perbarui data nama, username, email, dan foto profil Anda.") }}
         </p>
     </header>
 
-    <form method="post" action="{{ route('profile.update') }}" enctype="multipart/form-data">
+    <form method="post" action="{{ route('profile.update') }}" enctype="multipart/form-data" class="space-y-6">
         @csrf
         @method('patch')
 
-        <div class="row">
-            <div class="col-md-3 mb-3 text-center">
+        <div class="flex flex-col sm:flex-row items-center sm:items-start gap-6 pb-6 border-b border-slate-100">
+            <div class="shrink-0 text-center">
                 @if($user->avatar)
-                    <img src="{{ Storage::url($user->avatar) }}" alt="Avatar" class="img-thumbnail rounded-circle mb-2" style="width: 150px; height: 150px; object-fit: cover;">
+                    <img src="{{ Storage::url($user->avatar) }}" alt="Avatar" class="w-24 h-24 rounded-2xl object-cover border-2 border-indigo-100 shadow-sm mx-auto mb-2">
                 @else
-                    <div class="bg-secondary text-white d-flex align-items-center justify-content-center rounded-circle mx-auto mb-2" style="width: 150px; height: 150px; font-size: 3rem;">
+                    <div class="w-24 h-24 rounded-2xl bg-gradient-to-tr from-indigo-600 to-cyan-500 text-white font-bold text-3xl flex items-center justify-center mx-auto mb-2 shadow-md shadow-indigo-500/20">
                         {{ strtoupper(substr($user->fullname, 0, 1)) }}
                     </div>
                 @endif
+                <label for="avatar" class="cursor-pointer inline-block text-xs font-bold text-indigo-600 hover:text-indigo-700">
+                    Ganti Foto
+                </label>
+                <input id="avatar" name="avatar" type="file" accept="image/*" class="hidden">
+                @error('avatar')
+                    <p class="text-[11px] text-rose-600 mt-1">{{ $message }}</p>
+                @enderror
+            </div>
+
+            <div class="flex-1 w-full grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                    <label for="avatar" class="form-label small">Change Avatar</label>
-                    <input class="form-control form-control-sm @error('avatar') is-invalid @enderror" id="avatar" name="avatar" type="file" accept="image/*">
-                    @error('avatar')
-                        <div class="invalid-feedback">{{ $message }}</div>
-                    @enderror
-                </div>
-            </div>
-
-            <div class="col-md-9">
-                <div class="mb-3">
-                    <label for="fullname" class="form-label">{{ __('Full Name') }}</label>
-                    <input id="fullname" name="fullname" type="text" class="form-control @error('fullname') is-invalid @enderror" value="{{ old('fullname', $user->fullname) }}" required autofocus>
+                    <label for="fullname" class="block text-xs font-bold text-slate-700 mb-1.5">{{ __('Nama Lengkap') }}</label>
+                    <input id="fullname" name="fullname" type="text" value="{{ old('fullname', $user->fullname) }}" required class="w-full px-3.5 py-2.5 text-xs bg-slate-50 border border-slate-300 rounded-xl text-slate-900 focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600 transition-colors">
                     @error('fullname')
-                        <div class="invalid-feedback">{{ $message }}</div>
+                        <p class="text-[11px] text-rose-600 mt-1">{{ $message }}</p>
                     @enderror
                 </div>
 
-                <div class="mb-3">
-                    <label for="username" class="form-label">{{ __('Username') }}</label>
-                    <input id="username" name="username" type="text" class="form-control @error('username') is-invalid @enderror" value="{{ old('username', $user->username) }}" required>
+                <div>
+                    <label for="username" class="block text-xs font-bold text-slate-700 mb-1.5">{{ __('Username / NIS') }}</label>
+                    <input id="username" name="username" type="text" value="{{ old('username', $user->username) }}" required class="w-full px-3.5 py-2.5 text-xs font-mono bg-slate-50 border border-slate-300 rounded-xl text-slate-900 focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600 transition-colors">
                     @error('username')
-                        <div class="invalid-feedback">{{ $message }}</div>
+                        <p class="text-[11px] text-rose-600 mt-1">{{ $message }}</p>
                     @enderror
                 </div>
 
-                <div class="mb-3">
-                    <label for="email" class="form-label">{{ __('Email') }}</label>
-                    <input id="email" name="email" type="email" class="form-control @error('email') is-invalid @enderror" value="{{ old('email', $user->email) }}" required>
+                <div>
+                    <label for="email" class="block text-xs font-bold text-slate-700 mb-1.5">{{ __('Alamat Email') }}</label>
+                    <input id="email" name="email" type="email" value="{{ old('email', $user->email) }}" required class="w-full px-3.5 py-2.5 text-xs bg-slate-50 border border-slate-300 rounded-xl text-slate-900 focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600 transition-colors">
                     @error('email')
-                        <div class="invalid-feedback">{{ $message }}</div>
+                        <p class="text-[11px] text-rose-600 mt-1">{{ $message }}</p>
                     @enderror
                 </div>
 
-                <div class="mb-3">
-                    <label for="phone" class="form-label">{{ __('Phone') }}</label>
-                    <input id="phone" name="phone" type="text" class="form-control @error('phone') is-invalid @enderror" value="{{ old('phone', $user->phone) }}">
+                <div>
+                    <label for="phone" class="block text-xs font-bold text-slate-700 mb-1.5">{{ __('Nomor Telepon / WhatsApp') }}</label>
+                    <input id="phone" name="phone" type="text" value="{{ old('phone', $user->phone) }}" placeholder="081234567890" class="w-full px-3.5 py-2.5 text-xs bg-slate-50 border border-slate-300 rounded-xl text-slate-900 focus:bg-white focus:outline-hidden focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-600 transition-colors">
                     @error('phone')
-                        <div class="invalid-feedback">{{ $message }}</div>
+                        <p class="text-[11px] text-rose-600 mt-1">{{ $message }}</p>
                     @enderror
-                </div>
-
-                <div class="d-flex align-items-center gap-3">
-                    <button type="submit" class="btn btn-primary">{{ __('Save Changes') }}</button>
                 </div>
             </div>
+        </div>
+
+        <div class="flex items-center justify-end">
+            <button type="submit" class="px-5 py-2.5 rounded-xl text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-700 transition-colors shadow-sm shadow-indigo-500/20 cursor-pointer">
+                {{ __('Simpan Perubahan') }}
+            </button>
         </div>
     </form>
 </section>

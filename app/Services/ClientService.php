@@ -23,10 +23,16 @@ class ClientService extends BaseService
 
     public function createClient(array $data)
     {
+        $redirects = preg_split('/[\r\n,]+/', $data['redirect']);
+        $redirects = array_values(array_filter(array_map('trim', $redirects)));
+        if (empty($redirects)) {
+            $redirects = [$data['redirect']];
+        }
+
         // Use Passport's repository to create the client and generate secret
         $client = $this->passportClientRepository->createAuthorizationCodeGrantClient(
             $data['name'],
-            [$data['redirect']],
+            $redirects,
             true // confidential
         );
 
@@ -42,8 +48,14 @@ class ClientService extends BaseService
     {
         $client = $this->clientRepository->findById($id);
         
+        $redirects = preg_split('/[\r\n,]+/', $data['redirect']);
+        $redirects = array_values(array_filter(array_map('trim', $redirects)));
+        if (empty($redirects)) {
+            $redirects = [$data['redirect']];
+        }
+
         $client->name = $data['name'];
-        $client->redirect_uris = [$data['redirect']];
+        $client->redirect_uris = $redirects;
         $client->description = $data['description'] ?? null;
         $client->status = $data['status'] ?? 'active';
         $client->save();

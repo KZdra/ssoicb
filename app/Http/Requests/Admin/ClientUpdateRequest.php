@@ -24,7 +24,7 @@ class ClientUpdateRequest extends FormRequest
     {
         return [
             'name' => 'required|string|max:255',
-            'redirect' => 'required|url',
+            'redirect' => 'required|string',
             'description' => 'nullable|string',
             'status' => 'required|in:active,inactive',
         ];

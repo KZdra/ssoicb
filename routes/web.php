@@ -1,19 +1,19 @@
 <?php
 
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\DashboardController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
-    return response()->json([
-        'message' => 'Are You Lost? Honey? <:',
-    ]);
+    if (auth()->check()) {
+        return redirect()->route('dashboard');
+    }
+    return redirect()->route('login');
 });
 
 Route::get('/sso/logout', [App\Http\Controllers\Auth\AuthenticatedSessionController::class, 'ssoLogout'])->name('sso.logout');
 
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+Route::get('/dashboard', [DashboardController::class, 'index'])->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -22,6 +22,9 @@ Route::middleware('auth')->group(function () {
 
     // Admin Routes
     Route::middleware('role:admin')->prefix('admin')->name('admin.')->group(function () {
+        // Bulk import & template for users
+        Route::get('users/template', [\App\Http\Controllers\Admin\UserController::class, 'downloadTemplate'])->name('users.template');
+        Route::post('users/import', [\App\Http\Controllers\Admin\UserController::class, 'import'])->name('users.import');
         Route::resource('users', \App\Http\Controllers\Admin\UserController::class);
         
         Route::post('clients/{id}/generate-secret', [\App\Http\Controllers\Admin\ClientController::class, 'generateSecret'])->name('clients.generate-secret');

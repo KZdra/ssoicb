@@ -1,27 +1,28 @@
 <x-app-layout>
     <x-slot name="header">
-        {{ __('Profile') }}
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div>
+                <h1 class="text-xl font-extrabold text-slate-900 tracking-tight">{{ __('Pengaturan Akun & Profil') }}</h1>
+                <p class="text-xs text-slate-500 mt-0.5">Kelola informasi pribadi, ubah password akun, atau amankan sesi login Anda.</p>
+            </div>
+        </div>
     </x-slot>
 
-    <div class="row">
-        <div class="col-md-8 mx-auto">
-            <div class="card shadow-sm border-0 mb-4">
-                <div class="card-body p-4 p-md-5">
-                    @include('profile.partials.update-profile-information-form')
-                </div>
-            </div>
+    <div class="max-w-4xl mx-auto space-y-6">
+        <!-- Profile Info Card -->
+        <div class="bg-white rounded-2xl border border-slate-200/80 shadow-xs p-6 sm:p-8">
+            @include('profile.partials.update-profile-information-form')
+        </div>
 
-            <div class="card shadow-sm border-0 mb-4">
-                <div class="card-body p-4 p-md-5">
-                    @include('profile.partials.update-password-form')
-                </div>
-            </div>
+        <!-- Password Card -->
+        <div class="bg-white rounded-2xl border border-slate-200/80 shadow-xs p-6 sm:p-8">
+            @include('profile.partials.update-password-form')
+        </div>
 
-            <div class="card shadow-sm border-danger">
-                <div class="card-body p-4 p-md-5">
-                    @include('profile.partials.delete-user-form')
-                </div>
-            </div>
+        <!-- Danger Zone Card -->
+        <div class="bg-white rounded-2xl border border-rose-200 shadow-xs p-6 sm:p-8 relative overflow-hidden">
+            <div class="absolute top-0 left-0 bottom-0 w-1.5 bg-rose-500"></div>
+            @include('profile.partials.delete-user-form')
         </div>
     </div>
 </x-app-layout>

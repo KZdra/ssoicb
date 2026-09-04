@@ -19,24 +19,25 @@ class ClientController extends Controller
     {
         $search = $request->input('search');
         $clients = $this->clientService->getAllPaginated(15, $search);
-        // dd($clients);
         return view('admin.clients.index', compact('clients', 'search'));
     }
 
     public function generateSecret($id)
     {
         $client = $this->clientService->generateSecret($id);
+        session()->flash('raw_secret', $client->plainSecret);
         session()->flash('plain_secret', $client->plainSecret);
         session()->flash('new_client_name', $client->name);
-        return redirect()->route('admin.clients.index')->with('success', 'Secret generated successfully.');
+        return redirect()->route('admin.clients.index')->with('success', 'Secret berhasil digenerate.');
     }
 
     public function regenerateSecret($id)
     {
         $client = $this->clientService->regenerateSecret($id);
+        session()->flash('raw_secret', $client->plainSecret);
         session()->flash('plain_secret', $client->plainSecret);
         session()->flash('new_client_name', $client->name);
-        return redirect()->route('admin.clients.index')->with('success', 'Secret regenerated successfully.');
+        return redirect()->route('admin.clients.index')->with('success', 'Secret berhasil diperbarui.');
     }
 
     public function create()
@@ -47,10 +48,14 @@ class ClientController extends Controller
     public function store(\App\Http\Requests\Admin\ClientStoreRequest $request)
     {
         $validated = $request->validated();
+        if (empty($validated['status'])) {
+            $validated['status'] = 'active';
+        }
         $client = $this->clientService->createClient($validated);
+        session()->flash('raw_secret', $client->plainSecret);
         session()->flash('plain_secret', $client->plainSecret);
         session()->flash('new_client_name', $client->name);
-        return redirect()->route('admin.clients.index')->with('success', 'Client Application created successfully.');
+        return redirect()->route('admin.clients.index')->with('success', 'Aplikasi Klien <strong>' . e($client->name) . '</strong> berhasil didaftarkan.');
     }
 
     public function edit($id)
@@ -63,12 +68,12 @@ class ClientController extends Controller
     {
         $validated = $request->validated();
         $this->clientService->updateClient($id, $validated);
-        return redirect()->route('admin.clients.index')->with('success', 'Client Application updated successfully.');
+        return redirect()->route('admin.clients.index')->with('success', 'Aplikasi Klien berhasil diperbarui.');
     }
 
     public function destroy($id)
     {
         $this->clientService->deleteClient($id);
-        return redirect()->route('admin.clients.index')->with('success', 'Client Application deleted successfully.');
+        return redirect()->route('admin.clients.index')->with('success', 'Aplikasi Klien berhasil dihapus.');
     }
 }

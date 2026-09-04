@@ -1,116 +1,118 @@
 <x-app-layout>
     <x-slot name="header">
-        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center">
-            <span class="mb-2 mb-md-0">{{ __('Client Applications') }}</span>
-            <a href="{{ route('admin.clients.create') }}" class="btn btn-primary btn-sm d-flex align-items-center">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="me-1"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-                Add New Client
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div>
+                <h1 class="text-xl font-extrabold text-slate-900 tracking-tight">{{ __('Aplikasi Klien Terhubung') }}</h1>
+                <p class="text-xs text-slate-500 mt-0.5">Kelola konfigurasi OAuth2 Client ID, Secret, dan Redirect URI untuk aplikasi eksternal.</p>
+            </div>
+            <a href="{{ route('admin.clients.create') }}" class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-700 active:scale-95 transition-all shadow-sm shadow-indigo-500/20 cursor-pointer">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                <span>Daftarkan Klien Baru</span>
             </a>
         </div>
     </x-slot>
-    @if(session('plain_secret'))
-        <div class="alert alert-warning border-warning shadow-sm mb-4" role="alert">
-            <h4 class="alert-heading fw-bold text-dark d-flex align-items-center gap-2 mb-3">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-warning"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-                Copy the Client Secret Now!
-            </h4>
-            <p class="mb-3">Here is the client secret for <strong>{{ session('new_client_name') }}</strong>. Please copy it immediately. <strong>For security reasons, you will not be able to see this secret again.</strong></p>
-            <div class="input-group">
-                <code class="form-control bg-light user-select-all p-3 border rounded text-dark fs-5 font-monospace fw-bold" id="plain-secret-code">{{ session('plain_secret') }}</code>
-                <button class="btn btn-warning fw-semibold px-4" type="button" onclick="navigator.clipboard.writeText(document.getElementById('plain-secret-code').innerText); alert('Secret copied to clipboard!');">
-                    Copy Secret
-                </button>
+
+    <!-- Client Secret Warning Alert -->
+    @if(session('raw_secret'))
+        <div class="mb-6 p-5 rounded-2xl bg-amber-50 border border-amber-200 text-amber-900 shadow-sm">
+            <div class="flex items-start gap-3">
+                <div class="w-8 h-8 rounded-xl bg-amber-500 text-white flex items-center justify-center shrink-0">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+                </div>
+                <div class="flex-1 min-w-0" x-data="{ copied: false }">
+                    <h3 class="text-sm font-bold text-amber-950">Simpan Client Secret Sekarang!</h3>
+                    <p class="text-xs text-amber-800 mt-0.5">Secret ini hanya ditampilkan <strong>satu kali</strong> demi keamanan. Salin dan simpan pada file <code>.env</code> aplikasi klien Anda.</p>
+                    <div class="mt-3 flex items-center gap-2">
+                        <input type="text" readonly value="{{ session('raw_secret') }}" id="secretInput" class="w-full max-w-md px-3 py-2 text-xs font-mono bg-white border border-amber-300 rounded-xl text-slate-800">
+                        <button type="button" @click="navigator.clipboard.writeText('{{ session('raw_secret') }}'); copied = true; setTimeout(() => copied = false, 2000)" class="px-3.5 py-2 text-xs font-bold text-white bg-amber-600 hover:bg-amber-700 rounded-xl transition-colors shrink-0">
+                            <span x-text="copied ? 'Tersalin!' : 'Salin Secret'"></span>
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
     @endif
 
-    <div class="card shadow-sm border-0 mb-4">
-        <div class="card-body p-0">
-            <div class="p-4 border-bottom d-flex justify-content-between align-items-center bg-white rounded-top">
-                <h5 class="m-0 text-dark fw-semibold" style="font-size: 1rem;">All Clients</h5>
-                <form action="{{ route('admin.clients.index') }}" method="GET" class="d-flex">
-                    <div class="input-group input-group-sm" style="width: 250px;">
-                        <input type="text" name="search" class="form-control" placeholder="Search clients..." value="{{ request('search') }}">
-                        <button type="submit" class="btn btn-outline-secondary bg-light text-dark">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-                        </button>
-                    </div>
-                </form>
-            </div>
-
-            <div class="table-responsive">
-                <table class="table table-hover align-middle">
-                    <thead class="table-light">
-                        <tr>
-                            <th>client_id</th>
-                            <th>application_name</th>
-                            <th>redirect_uri</th>
-                            <th>status</th>
-                            <th>client_secret</th>
-                            <th>description</th>
-                            <th>Actions</th>
+    <!-- Clients Table -->
+    <div class="bg-white rounded-2xl border border-slate-200/80 shadow-xs overflow-hidden mb-6">
+        <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse text-xs">
+                <thead>
+                    <tr class="bg-slate-50/80 border-b border-slate-200/80 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
+                        <th class="py-3.5 px-4">Nama Aplikasi</th>
+                        <th class="py-3.5 px-4">Client ID</th>
+                        <th class="py-3.5 px-4">Redirect URIs</th>
+                        <th class="py-3.5 px-4">Status</th>
+                        <th class="py-3.5 px-4">Tgl Registrasi</th>
+                        <th class="py-3.5 px-4 text-right">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100">
+                    @forelse($clients as $client)
+                        <tr class="hover:bg-slate-50/60 transition-colors">
+                            <td class="py-3.5 px-4">
+                                <div class="font-bold text-slate-900 text-xs">{{ $client->name }}</div>
+                                <div class="text-[11px] text-slate-400 mt-0.5">{{ Str::limit($client->description ?? '-', 45) }}</div>
+                            </td>
+                            <td class="py-3.5 px-4 whitespace-nowrap" x-data="{ copied: false }">
+                                <button type="button" @click="navigator.clipboard.writeText('{{ $client->id }}'); copied = true; setTimeout(() => copied = false, 1500)" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-100 border border-slate-200 text-slate-700 hover:bg-slate-200 transition-colors font-mono text-[11px]" title="Klik untuk salin Client ID">
+                                    <span x-text="copied ? 'Copied!' : '{{ $client->id }}'"></span>
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                                </button>
+                            </td>
+                            <td class="py-3.5 px-4">
+                                @if(is_array($client->redirect_uris))
+                                    @foreach($client->redirect_uris as $uri)
+                                        <code class="block text-[11px] font-mono text-slate-600 truncate max-w-xs">{{ $uri }}</code>
+                                    @endforeach
+                                @else
+                                    <code class="text-[11px] font-mono text-slate-600 truncate max-w-xs block">{{ $client->redirect ?? 'N/A' }}</code>
+                                @endif
+                            </td>
+                            <td class="py-3.5 px-4 whitespace-nowrap">
+                                <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold {{ $client->status === 'active' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-slate-100 text-slate-600 border border-slate-200' }}">
+                                    {{ ucfirst($client->status) }}
+                                </span>
+                            </td>
+                            <td class="py-3.5 px-4 whitespace-nowrap text-slate-400 text-[11px]">
+                                {{ $client->created_at ? $client->created_at->format('d M Y') : '-' }}
+                            </td>
+                            <td class="py-3.5 px-4 whitespace-nowrap text-right">
+                                <div class="inline-flex items-center gap-1.5">
+                                    <a href="{{ route('admin.clients.edit', $client->id) }}" class="w-8 h-8 rounded-lg flex items-center justify-center bg-indigo-50 text-indigo-600 hover:bg-indigo-600 hover:text-white border border-indigo-100 transition-colors" title="Edit Klien">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                                    </a>
+                                    <form action="{{ route('admin.clients.regenerate-secret', $client->id) }}" method="POST" data-confirm="Regenerasi Secret akan memutuskan koneksi aktif hingga aplikasi klien diperbarui dengan Secret baru. Lanjutkan?" data-title="Regenerasi Secret" data-icon="question" data-confirm-text="Ya, Regenerasi!">
+                                        @csrf
+                                        <button type="submit" class="w-8 h-8 rounded-lg flex items-center justify-center bg-amber-50 text-amber-600 hover:bg-amber-600 hover:text-white border border-amber-100 transition-colors cursor-pointer" title="Regenerasi Secret">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+                                        </button>
+                                    </form>
+                                    <form action="{{ route('admin.clients.destroy', $client->id) }}" method="POST" data-confirm="Hapus aplikasi klien {{ $client->name }} secara permanen?" data-title="Hapus Klien" data-danger="true" data-confirm-text="Ya, Hapus!">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="w-8 h-8 rounded-lg flex items-center justify-center bg-rose-50 text-rose-600 hover:bg-rose-600 hover:text-white border border-rose-100 transition-colors cursor-pointer" title="Hapus Klien">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
                         </tr>
-                    </thead>
-                    <tbody>
-                        @forelse($clients as $client)
-                            <tr>
-                                <td>{{ $client->id }}</td>
-                                <td>{{ $client->name }}</td>
-                                <td><code>{{ is_array($client->redirect_uris) ? implode(', ', $client->redirect_uris) : ($client->redirect ?? 'N/A') }}</code></td>
-                                <td>
-                                    <span class="badge {{ $client->status === 'active' ? 'bg-success' : 'bg-warning text-dark' }}">
-                                        {{ ucfirst($client->status) }}
-                                    </span>
-                                </td>
-                                <td>
-                                    @if($client->secret)
-                                        <div class="d-flex flex-column gap-2 align-items-start">
-                                            <span class="text-muted small d-flex align-items-center">
-                                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="me-1 text-success"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
-                                                Hashed (Secure)
-                                            </span>
-                                            <form action="{{ route('admin.clients.regenerate-secret', $client->id) }}" method="POST" class="w-100" onsubmit="return confirm('Regenerate secret? Old secret will no longer work.');">
-                                                @csrf
-                                                <button type="submit" class="btn btn-sm btn-light border shadow-sm text-warning w-100">Regenerate</button>
-                                            </form>
-                                        </div>
-                                    @else
-                                        <form action="{{ route('admin.clients.generate-secret', $client->id) }}" method="POST">
-                                            @csrf
-                                            <button type="submit" class="btn btn-sm btn-success shadow-sm w-100">Generate Secret</button>
-                                        </form>
-                                    @endif
-                                </td>
-                                <td>
-                                    <small class="text-muted">{{ Str::limit($client->description, 50) }}</small>
-                                </td>
-                                <td>
-                                    <div class="d-flex gap-2">
-                                        <a href="{{ route('admin.clients.edit', $client->id) }}" class="btn btn-sm btn-light text-primary border shadow-sm" title="Edit Client">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
-                                        </a>
-                                        <form action="{{ route('admin.clients.destroy', $client->id) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this client application?');">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="btn btn-sm btn-light text-danger border shadow-sm" title="Delete Client">
-                                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
-                                            </button>
-                                        </form>
+                    @empty
+                        <tr>
+                            <td colspan="6" class="py-8 text-center text-slate-400">
+                                <div class="flex flex-col items-center justify-center">
+                                    <div class="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center text-slate-400 mb-2">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
                                     </div>
-                                </td>
-                            </tr>
-                        @empty
-                            <tr>
-                                <td colspan="7" class="text-center py-4 text-muted">No client applications found.</td>
-                            </tr>
-                        @endforelse
-                    </tbody>
-                </table>
-            </div>
-
-            <div class="p-3 border-top">
-                {{ $clients->links('pagination::bootstrap-5') }}
-            </div>
+                                    <div class="font-bold text-slate-700 text-xs">Belum ada aplikasi klien terdaftar</div>
+                                    <div class="text-[11px] text-slate-400 mt-0.5">Daftarkan aplikasi eksternal pertama Anda untuk memulai SSO.</div>
+                                </div>
+                            </td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
         </div>
     </div>
 </x-app-layout>
