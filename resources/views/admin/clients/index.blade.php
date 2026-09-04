@@ -24,7 +24,7 @@
                     <p class="text-xs text-amber-800 mt-0.5">Secret ini hanya ditampilkan <strong>satu kali</strong> demi keamanan. Salin dan simpan pada file <code>.env</code> aplikasi klien Anda.</p>
                     <div class="mt-3 flex items-center gap-2">
                         <input type="text" readonly value="{{ session('raw_secret') }}" id="secretInput" class="w-full max-w-md px-3 py-2 text-xs font-mono bg-white border border-amber-300 rounded-xl text-slate-800">
-                        <button type="button" @click="navigator.clipboard.writeText('{{ session('raw_secret') }}'); copied = true; setTimeout(() => copied = false, 2000)" class="px-3.5 py-2 text-xs font-bold text-white bg-amber-600 hover:bg-amber-700 rounded-xl transition-colors shrink-0">
+                        <button type="button" @click="copyToClipboard('{{ session('raw_secret') }}'); copied = true; setTimeout(() => copied = false, 2000)" class="px-3.5 py-2 text-xs font-bold text-white bg-amber-600 hover:bg-amber-700 rounded-xl transition-colors shrink-0">
                             <span x-text="copied ? 'Tersalin!' : 'Salin Secret'"></span>
                         </button>
                     </div>
@@ -55,7 +55,7 @@
                                 <div class="text-[11px] text-slate-400 mt-0.5">{{ Str::limit($client->description ?? '-', 45) }}</div>
                             </td>
                             <td class="py-3.5 px-4 whitespace-nowrap" x-data="{ copied: false }">
-                                <button type="button" @click="navigator.clipboard.writeText('{{ $client->id }}'); copied = true; setTimeout(() => copied = false, 1500)" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-100 border border-slate-200 text-slate-700 hover:bg-slate-200 transition-colors font-mono text-[11px]" title="Klik untuk salin Client ID">
+                                <button type="button" @click="copyToClipboard('{{ $client->id }}'); copied = true; setTimeout(() => copied = false, 1500)" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-100 border border-slate-200 text-slate-700 hover:bg-slate-200 transition-colors font-mono text-[11px]" title="Klik untuk salin Client ID">
                                     <span x-text="copied ? 'Copied!' : '{{ $client->id }}'"></span>
                                     <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
                                 </button>

@@ -3,6 +3,31 @@ import Swal from 'sweetalert2';
 
 window.Swal = Swal;
 
+// Universal Clipboard Copy helper (supports non-secure HTTP on IP address as well as HTTPS)
+window.copyToClipboard = function (text) {
+    if (navigator.clipboard && window.isSecureContext) {
+        return navigator.clipboard.writeText(text);
+    } else {
+        const textArea = document.createElement('textarea');
+        textArea.value = text;
+        textArea.style.position = 'fixed';
+        textArea.style.left = '-999999px';
+        textArea.style.top = '-999999px';
+        textArea.style.opacity = '0';
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+        try {
+            document.execCommand('copy');
+            textArea.remove();
+            return Promise.resolve();
+        } catch (err) {
+            textArea.remove();
+            return Promise.reject(err);
+        }
+    }
+};
+
 // Global custom confirmation handler using SweetAlert2
 document.addEventListener('DOMContentLoaded', () => {
     document.addEventListener('submit', (e) => {
