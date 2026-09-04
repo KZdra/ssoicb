@@ -101,10 +101,12 @@ class AuthenticatedSessionController extends Controller
         $request->session()->regenerateToken();
 
         $redirectUri = $request->query('redirect_uri');
-        if ($redirectUri && (str_starts_with($redirectUri, 'http://127.0.0.1') || str_starts_with($redirectUri, 'http://192.168.0.9') || str_starts_with($redirectUri, 'http://localhost') || str_starts_with($redirectUri, 'https://'))) {
+        // if ($redirectUri && (str_starts_with($redirectUri, 'http://127.0.0.1') || str_starts_with($redirectUri, 'http://192.168.0.9') || str_starts_with($redirectUri, 'http://localhost') || str_starts_with($redirectUri, 'https://'))) {
+        //     return redirect($redirectUri);
+        // }
+        if ($redirectUri) {
             return redirect($redirectUri);
         }
-
         return redirect('/login');
     }
 
