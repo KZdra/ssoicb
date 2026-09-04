@@ -387,9 +387,6 @@ QUEUE_CONNECTION=database
 
 CACHE_STORE=database
 CACHE_PREFIX=sso_cache_
-
-PASSPORT_PRIVATE_KEY="file://storage/oauth-private.key"
-PASSPORT_PUBLIC_KEY="file://storage/oauth-public.key"
 ENVFILE
 
 chown www-data:www-data "$APP_DIR/.env"
